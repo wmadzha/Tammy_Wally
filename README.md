@@ -1,5 +1,5 @@
 # Tammy_Wally
-Azure Table Data Access Helper
+Light Weight Azure Table Data Access Helper 
 
 Internal Helper For Accessing Azure Table Data Source ,
 
