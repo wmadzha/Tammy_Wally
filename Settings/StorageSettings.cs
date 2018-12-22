@@ -8,7 +8,7 @@ namespace Tammy_Wally
             if(IsLive)
               return "LiveDataAzureStorageTableName";
             else
-              ret  "DevAzureStorageTableName";
+              return  "DevAzureStorageTableName";
         }
         public static string AzureStorageKey(bool IsLive)
         { 
