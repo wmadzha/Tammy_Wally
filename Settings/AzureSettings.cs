@@ -10,7 +10,7 @@ namespace Tammy_Wally
                      StorageSettings.AzureStorageAccountName(false),
                     StorageSettings.AzureStorageKey(false)
                     );
-            CloudStorageAccount acc = new CloudStorageAccount(cred, StorageSettings.AzureStorageAccountName, StorageSettings.EndPointSuffix, true);
+            CloudStorageAccount acc = new CloudStorageAccount(cred, StorageSettings.AzureStorageAccountName(false), StorageSettings.EndPointSuffix, true);
             return acc;
         }
     }
