@@ -7,8 +7,8 @@ namespace Tammy_Wally
         {
             Microsoft.WindowsAzure.Storage.Auth.StorageCredentials cred =
                 new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(
-                     StorageSettings.AzureStorageAccountName,
-                    StorageSettings.AzureStorageKey
+                     StorageSettings.AzureStorageAccountName(false),
+                    StorageSettings.AzureStorageKey(false)
                     );
             CloudStorageAccount acc = new CloudStorageAccount(cred, StorageSettings.AzureStorageAccountName, StorageSettings.EndPointSuffix, true);
             return acc;
