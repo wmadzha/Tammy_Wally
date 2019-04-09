@@ -24,7 +24,7 @@ namespace Tammy_Wally
                     TableContinuationToken tableContinuationToken = null;
                     do
                     {
-                        TableQuery<T> query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, TableName));
+                        TableQuery<T> query = new TableQuery<T>();
                         try
                         {
                             var queryResponse = await table.ExecuteQuerySegmentedAsync<T>(query, tableContinuationToken, null, null);
