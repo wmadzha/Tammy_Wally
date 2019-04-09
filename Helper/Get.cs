@@ -46,6 +46,41 @@ namespace Tammy_Wally
                     return null;
                 }
             }
+            public async static Task< List<T>> All<T>(string TableName , string PartitionKey) where T : TableEntity, new()
+            {
+                try
+                {
+                    List<T> Data = new List<T>();
+                    CloudStorageAccount storageAccount = AzureSettings.SetupAccount();
+                    CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+                    tableClient.DefaultRequestOptions.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(1), 10);
+                    CloudTable table = tableClient.GetTableReference(TableName);                   
+                    //await table.CreateIfNotExistsAsync();
+                    TableContinuationToken tableContinuationToken = null;
+                    do
+                    {
+                        TableQuery<T> query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, PartitionKey));
+                        try
+                        {
+                            var queryResponse = await table.ExecuteQuerySegmentedAsync<T>(query, tableContinuationToken, null, null);
+                            tableContinuationToken = queryResponse.ContinuationToken;
+                            Data.AddRange(queryResponse.Results);
+                        }
+                        catch (Exception exquery)
+                        {
+                            Console.WriteLine(exquery.InnerException);
+                            return null;
+                        }
+                    }
+                    while (tableContinuationToken != null);
+                    return Data;
+                }
+                catch (Exception ex)
+                {
+                    string temp = ex.Message;
+                    return null;
+                }
+            }
         }
         public static class Single
         {
