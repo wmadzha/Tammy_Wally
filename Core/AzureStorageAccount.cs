@@ -1,7 +1,7 @@
 
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
-namespace PenelopePie.Data.AzureTable.Core
+namespace Tammy_Wally.Core
 {
     public class AzureStorageAccount
     {
