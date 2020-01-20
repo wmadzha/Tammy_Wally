@@ -24,7 +24,7 @@ namespace Tammy_Wally.Context
     {
         public static AzureTableBuilder MapAnyBusinessModelEntity(this AzureTableBuilder builder, SampleAzureTableContext context)
         {
-            context.Project = new AzureTableSet<Project>(builder);
+            context.AnyBusinessModel = new AzureTableSet<Project>(builder);
             return builder;
         }
     }
