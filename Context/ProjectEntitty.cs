@@ -24,13 +24,13 @@ namespace Tammy_Wally.Context
     }
     public static partial class Extensions
     {
-        public static AzureTableBuilder MapProjectEntity(this AzureTableBuilder builder, PenelopePieAzureTableContext context)
+        public static AzureTableBuilder MapProjectEntity(this AzureTableBuilder builder, SampleAzureTableContext context)
         {
             context.Project = new AzureTableSet<Project>(builder);
             return builder;
         }
     }
-    public partial class PenelopePieAzureTableContext
+    public partial class SampleAzureTableContext
     {
         public virtual AzureTableSet<ProjectEntity> Project { get; set; }
     }
