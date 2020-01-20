@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace Tammy_Wally.Core
+namespace TammyWally.Core
 {
-    public interface IAzureTableSet<T> where T : TableEntity
+    public interface IAzureTableSet<T> where T : ITableEntity
     {
-        T GetByRowKey(string rowKey);
-        T GetByRowKey(string rowKey, string partitionkey);
-        IEnumerable<T> GetAll();
+        Task<ITableEntity> GetByRowKey(string rowKey, string partitionKey);
+        IEnumerable<ITableEntity> GetAll();
         bool Add(T entity);
         bool AddOrReplace(T entity);
         bool Delete(T entity);
         bool Edit(T entity);
     }
     public class AzureTableSet<T> :
-        IAzureTableSet<T> where T : TableEntity
+        IAzureTableSet<T> where T : ITableEntity
     {
         private CloudTable Table { get; set; }
         private TableOperation Operation { get; set; }
@@ -26,7 +26,9 @@ namespace Tammy_Wally.Core
         public AzureTableSet(AzureTableBuilder ctx)
         {
             _TableName = typeof(T).Name;
+
             Table = ctx.TableClient.GetTableReference(_TableName);
+            Table.CreateIfNotExistsAsync();
             TableClient = ctx.TableClient;
 
         }
@@ -88,55 +90,23 @@ namespace Tammy_Wally.Core
                 throw ex;
             }
         }
-        public T GetByRowKey(string rowKey)
+        public async Task<ITableEntity> GetByRowKey(string partitionKey, string rowKey)
         {
-            TableQuery<TableEntity> rangeQuery = new TableQuery<TableEntity>().Where(
-            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, rowKey));
-            TableContinuationToken tableContinuationToken = null;
-            var queryResponse = Table.ExecuteQuerySegmentedAsync<TableEntity>(rangeQuery, tableContinuationToken, null, null);
-            return queryResponse.Result.Results.FirstOrDefault() as T;
+            Operation = TableOperation.Retrieve<T>(partitionKey, rowKey);
+            var result = await Table.ExecuteAsync(Operation);
+            return result.Result as ITableEntity;
         }
-        public T GetByRowKey(string rowKey, string partitionkey)
+
+        public IEnumerable<ITableEntity> GetAll()
         {
-            TableQuery<TableEntity> rangeQuery = new TableQuery<TableEntity>().Where(
-                TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition(partitionkey, QueryComparisons.Equal, _TableName),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, rowKey)));
+            List<ITableEntity> Data = new List<ITableEntity>();
             TableContinuationToken tableContinuationToken = null;
-            var queryResponse = Table.ExecuteQuerySegmentedAsync<TableEntity>(rangeQuery, tableContinuationToken, null, null);
-            return queryResponse.Result.Results.FirstOrDefault() as T;
-        }
-        public IEnumerable<T> GetAll()
-        {
-            try
-            {
-                List<TableEntity> Data = new List<TableEntity>();
-                TableClient.DefaultRequestOptions.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(1), 10);
-                TableContinuationToken tableContinuationToken = null;
-                do
-                {
-                    TableQuery<TableEntity> query = new TableQuery<TableEntity>();
-                    try
-                    {
-                        var queryResponse = Table.ExecuteQuerySegmentedAsync<TableEntity>(query, tableContinuationToken, null, null);
-                        tableContinuationToken = queryResponse.Result.ContinuationToken;
-                        Data.AddRange(queryResponse.Result);
-                    }
-                    catch (Exception exquery)
-                    {
-                        Console.WriteLine(exquery.InnerException);
-                        return null;
-                    }
-                }
-                while (tableContinuationToken != null);
-                return Data as List<T>;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
+            TableQuery query = new TableQuery();
+            TableClient.DefaultRequestOptions.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(1), 10);
+            var queryResponse = Table.ExecuteQuerySegmentedAsync(query, tableContinuationToken, null, null);
+            tableContinuationToken = queryResponse.Result.ContinuationToken;
+            Data.AddRange(queryResponse.Result);
+            return Data;
         }
         #endregion
     }
