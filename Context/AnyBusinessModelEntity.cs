@@ -8,13 +8,13 @@ namespace Tammy_Wally.Context
         public Guid AnyId { get; set; }
         public string AnyName { get; set; }
         public string AnyDescription { get; set; }
-        public Project()
+        public AnyBusinessModelEntity ()
         {
             this.RowKey = Guid.NewGuid().ToString();
             this.Timestamp = DateTime.UtcNow;
             this.PartitionKey = "AnyBusinessModel";
         }
-        public Project(AnyBusinessModelDTO Data) : this()
+        public AnyBusinessModelEntity (AnyBusinessModelDTO Data) : this()
         {
             this.AnyName = Data.AnyName;
             this.AnyDescription = Data.AnyDescription;
@@ -24,7 +24,7 @@ namespace Tammy_Wally.Context
     {
         public static AzureTableBuilder MapAnyBusinessModelEntity(this AzureTableBuilder builder, SampleAzureTableContext context)
         {
-            context.AnyBusinessModel = new AzureTableSet<Project>(builder);
+            context.AnyBusinessModel = new AzureTableSet<AnyBusinessModelEntity >(builder);
             return builder;
         }
     }
