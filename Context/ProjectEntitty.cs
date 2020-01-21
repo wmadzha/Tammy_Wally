@@ -9,13 +9,13 @@ namespace Tammy_Wally.Context
         public string ProjectName { get; set; }
         public string ProjectDescription { get; set; }
 
-        public Project()
+        public ProjectEntity ()
         {
             this.RowKey = Guid.NewGuid().ToString();
             this.Timestamp = DateTime.UtcNow;
             this.PartitionKey = "Projects";
         }
-        public Project(ProjectDTO Data) : this()
+        public ProjectEntity (ProjectDTO Data) : this()
         {
             this.ProjectDescription = Data.ProjectDescription;
             this.ProjectName = Data.ProjectName;
@@ -26,7 +26,7 @@ namespace Tammy_Wally.Context
     {
         public static AzureTableBuilder MapProjectEntity(this AzureTableBuilder builder, SampleAzureTableContext context)
         {
-            context.Project = new AzureTableSet<Project>(builder);
+            context.Project = new AzureTableSet<ProjectEntity >(builder);
             return builder;
         }
     }
